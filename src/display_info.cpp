@@ -1,19 +1,14 @@
 #include "display_info.h"
+#include "common.h"
 
-const int DISPLAY_WIDTH = 16;
-const int DISPLAY_HEIGHT = 2;
-const int READ_X = 0;
-const int READ_Y = 1;
-
-DisplayInfo::DisplayInfo (void)
+DisplayInfo::DisplayInfo (void) : reading(0)
 {
-	this -> content = new char [DISPLAY_HEIGHT][DISPLAY_WIDTH];
-	this -> reading = new int [2];
+	this -> content = new unsigned char [display::height*display::width];
 }
 
-void DisplayInfo::setChar(int x, int y, char c)
+void DisplayInfo::setChar(int x, int y, unsigned char c)
 {
-	this -> content [y][x] = c;
+	this -> content [x+(display::width*y)] = c;
 }
 
 void DisplayInfo::setChar(int x, int y, const char * c, int length)
@@ -27,33 +22,16 @@ void DisplayInfo::setChar(int x, int y, const char * c, int length)
 
 void DisplayInfo::reset(void)
 {
-	this -> reading[READ_X] =0;
-	this -> reading[READ_Y] =0;
+	this -> reading = 0;
 }
 
-char DisplayInfo::nextChar(void)
+unsigned char DisplayInfo::nextChar(void)
 {
-	if (this -> reading[READ_X] < DISPLAY_WIDTH)
+	if (this -> reading > (display::width*display::height))
 	{
-		char retval = this -> content[this -> reading[READ_Y]] [this -> reading[READ_X]];
-		this -> reading[READ_X] = this -> reading[READ_X] + 1;
-		return retval;
+		this -> reset();
 	}
-	else
-	{
-		return 0xff;
-	}
-}
-
-void DisplayInfo::nextLine(void)
-{
-	if (this -> reading[READ_Y] < DISPLAY_HEIGHT)
-	{
-		this -> reading[READ_Y] = this -> reading[READ_Y] + 1;
-	}
-	else
-	{
-		this -> reading[READ_Y] = 0;
-	}
-	this -> reading[READ_X] = 0;
+	char retval = this -> content[this -> reading];
+	this -> reading++;
+	return retval;
 }
