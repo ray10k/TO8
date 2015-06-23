@@ -16,6 +16,6 @@ private:
 	const mkt_key key;
 	bool pressed;
 	ButtonListener *theLst;
-	unsigned short cheatTimer;
+	unsigned long long int startTime, stopTime;
 };
 #endif

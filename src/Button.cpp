@@ -2,39 +2,33 @@
 #include "Armboard.h"
 
 Button :: Button (mkt_key aKey) : 
-	key (aKey)
-{
-		
-}
+	key (aKey),
+	pressed (false),
+	startTime (0),
+	stopTime (0)
+{}
 
 void Button :: setListener (ButtonListener *lst){
-	theLst = lst;
-	//pressed = armboard::keypad::is_pressed (key);
-	pressed = false;
-	cheatTimer = 0;
+	theLst = lst,
 }
 
 void Button :: updateState (void){
 	bool b = armboard::keypad::is_pressed (key);
 	
-	if(pressed){
-		if(!b){
+	if (pressed){
+		if (!b){
 			pressed = false;
-			cheatTimer = 0;
+			startTime = 0;
 			theLst->buttonShortPress (this);
 		}
-		else if(cheatTimer >= 1500){
+		else if (startTime >= run_time()){
 			pressed = false;
-			cheatTimer = 0;
+			startTime = 0;
 			theLst->buttonLongPress (this);
 		}
-		else{
-			cheatTimer += 100;
-		}
 	}
-	else if(b){
+	else if (b){
 		pressed = true;
+		startTime = run_time() + 1500;
 	}
 }
-
-//longPressTimer.set(1500 MS);
