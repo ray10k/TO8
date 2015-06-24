@@ -17,11 +17,6 @@ void DisplayController::write()
 	{
 		writeString(buffer[y],display::width);
 		armboard::LCD::goto_xy(0,y+1);// char_write('/n') werkt niet.
-		for (int i = 0; i < display::width; i++)
-		{
-			std::cout << buffer[y][i];
-		}
-		std::cout << std::endl;
 	}
 }
 
