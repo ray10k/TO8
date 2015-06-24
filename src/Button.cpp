@@ -4,8 +4,7 @@
 Button :: Button (mkt_key aKey) : 
 	key (aKey),
 	pressed (false),
-	startTime (0),
-	stopTime (0)
+	startTime (0)
 {}
 
 void Button :: setListener (ButtonListener *lst){
