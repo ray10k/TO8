@@ -1,6 +1,8 @@
 #ifndef __DISPLAY_INFO_H
 #define __DISPLAY_INFO_H 
 
+#include "common.h"
+
 //**********
 //
 // class DisplayInfo
@@ -19,23 +21,27 @@ public:
 	DisplayInfo(void);
 	//! Writes the given character to the given position.
 	//
-	//! Note that this function does not check if it's going out
-	//! of bounds, and should be used with caution.
-	void setChar(int x, int y, char c);
+	//! Characters that would be placed out of bounds are ignored
+	//! without further warning.
+	void setChar(unsigned int x, unsigned int y, char c);
 	//! Writes the string to the given position.
-	//
-	//! Note that this function does not check if it's going out
-	//! of bounds, and should be used with caution.
-	void setChar(int x, int y, const char * c, int length);
+	void setChar(unsigned int x, unsigned int y, const char * c, int length);
 	//! Returns the reading position to the top-left of the display.
 	void reset(void);
 	//! Reads out the next character.
 	//
 	//! Returns the character at the current position, and automatically
 	//! changes lines at the end of each line.
-	unsigned char nextChar(void);
+	char nextChar(void);
+	//! Empties the buffer
+	void clear(void);
+	//! Copies the contents of the line to the given array.
+	//
+	//! Does not confirm that the buffer is large enough to contain the
+	//! line, and may cause overrun.
+	void copyBuffer(unsigned int line, char * buffer);
 private:
-	unsigned char[] content;
+	char content[display::characters];
 	unsigned int reading;
 };
 

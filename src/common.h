@@ -5,9 +5,9 @@
 
 namespace display
 {
-	const int width = 16;
-	const int height = 2;
-	const int characters = 32;
+	const unsigned int width = 16;
+	const unsigned int height = 2;
+	const unsigned int characters = width * height;
 }
 
 #endif

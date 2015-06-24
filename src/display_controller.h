@@ -17,31 +17,36 @@
 //
 //*************************************
 
-class DisplayController : public task
+class DisplayController : public RTOS::task
 {
 public:
 	//! default constructor.
-	DisplayController(void) : standbyFlag(this,"display standby flag"), LCDChannel(this,"LCD data channel"), running(true)
+	DisplayController(void) : 
+		RTOS::task(999, "display controller"),
+		standbyFlag(this,"display standby flag"), 
+		testFlag(this,"display test flag"),
+		LCDChannel(this,"LCD data channel"), 
+		running(true),
+		tested(false)
 	{
 	 	buffLen = display::characters+display::height;
-		buffer = new unsigned char [buffLen]
 	}	//total number of characters on display,
 		//plus one extra character per line for newline character.
 	//! Queues up the offered content for displaying.
 	void display(DisplayInfo & content);
-	//! Performs display test.
-	//
-	//! Note that this can be resource intensive.
+	//! Schedule display test.
 	void test();
 
 private:
 	void main(void);
-	void write(DisplayInfo * info);
+	void write(void);
+	void LCDTest(void);
+	void writeString(const char * string, int length);
 	
-	RTOS::flag standbyFlag;
+	RTOS::flag standbyFlag, testFlag;
 	RTOS::channel<DisplayInfo,3> LCDChannel;
-	bool running;
-	unsigned char buffer[];
+	bool running,tested;
+	char buffer[display::height][display::width];
 	int buffLen;
 };
 

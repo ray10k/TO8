@@ -3,8 +3,6 @@
 #include "pRTOS.h"
 #include "common.h"
 
-void LCDTest(void);
-
 void DisplayController::display(DisplayInfo & content)
 {
 	LCDChannel.write(content);
@@ -12,15 +10,19 @@ void DisplayController::display(DisplayInfo & content)
 
 void DisplayController::write()
 {
-	Armboard::LCD::command(0x02); //cursor to home position.
-	wait(2 MS);//the above command can take a while to complete...
-	int index;
+	armboard::LCD::clear();
+	int y;
 
-	for (index = 0; index < this -> buffLen; index ++)
+	for (y = 0; y < display::height; y++)
 	{
-		Armboard::LCD::char_write(this -> buffer[index]);
+		writeString(buffer[y],display::width);
+		armboard::LCD::goto_xy(0,y+1);// char_write('/n') werkt niet.
+		for (int i = 0; i < display::width; i++)
+		{
+			std::cout << buffer[y][i];
+		}
+		std::cout << std::endl;
 	}
-
 }
 
 void DisplayController::main(void)
@@ -30,19 +32,26 @@ void DisplayController::main(void)
 		RTOS::event e = wait();
 		if (e == standbyFlag)
 		{
-			Armboard::LCD::command(0x08); //turn off LCD entirely.
+			armboard::LCD::command(0x08); //turn off LCD entirely.
 			running = false;
+		}
+		else if (e == testFlag)
+		{
+			if (!running)
+			{
+				armboard::LCD::command(0x0C);
+				running = true;
+			}
+			LCDTest();
 		}
 		else if (e == LCDChannel)
 		{
 			if (!running)
 			{
-				Armboard::LCD::command(0x0C); //LCD on, no blinking cursor.
+				armboard::LCD::command(0x0C); //LCD on, no blinking cursor.
 				running = true;
 			}
 			DisplayInfo toPrint = LCDChannel.read();
-			toPrint.reset();
-
 			int x,y;
 			int index = 0;
 
@@ -50,6 +59,7 @@ void DisplayController::main(void)
 			// the data to be written is copied to a buffer first
 			// so the source of the data can't accidentally overwrite
 			// it during writing to the display.
+			/*
 			for (y = 0; y < display::height; y++)
 			{
 				for (x = 0; x < display::width; x++)
@@ -60,6 +70,11 @@ void DisplayController::main(void)
 				buffer[index] = '\n';
 				index++;
 			}
+			*/
+			for (y = 0; y < display::height; y++)
+			{
+				toPrint.copyBuffer(y,buffer[y]);
+			}
 
 			write();
 		}
@@ -68,43 +83,55 @@ void DisplayController::main(void)
 
 void DisplayController::test(void)
 {
-	LCDTest();
+	this -> testFlag.set();
 }
 
-void writeString(const unsigned char * string, int length)
+void DisplayController::writeString(const char * string, int length)
 {
 	int i;
 	for (i = 0; i < length; i++)
 	{
-		Armboard::LCD::char_write(*(string+i));
+		armboard::LCD::char_write_raw(*(string+i));
 	}
 }
 
-void LCDTest()
+void DisplayController::LCDTest()
 {
-	Armboard::LCD::command(0x40);
-	writeString("5*UJuj5*",8);
-	writeString("*UJuj5*5",8);
-	
-	Armboard::LCD::command(0x80);
-	Armboard::LCD::clear();
+	if (!tested)
+	{
+		tested = true;
+		armboard::LCD::command(0x40);
+		writeString("5*5*5*5*",8);
+		writeString("*5*5*5*5",8);
+		armboard::LCD::command(0x80);
+	}
+	armboard::LCD::clear();
 	int x,y;
 	for (y = 0; y < display::height; y++)
 	{
 		for (x = 0; x < display::width; x++)
 		{
-			Armboard::LCD::char_write_raw(0);
+			armboard::LCD::char_write_raw(0);
 		}
-		Armboard::LCD::char_write('\n');
+		armboard::LCD::char_write('\n');
+		for (x = 0; x < display::width; x++)
+		{
+			armboard::LCD::char_write_raw(0);
+		}
 	}
-	wait(2 S);
+	sleep (1 S);
+	armboard::LCD::clear();
 	for (y = 0; y < display::height; y++)
 	{
 		for (x = 0; x < display::width; x++)
 		{
-			Armboard::LCD::char_write_raw(1);
+			armboard::LCD::char_write_raw(1);
 		}
-		Armboard::LCD::char_write('\n');
+		armboard::LCD::char_write('\n');
+		for (x = 0; x < display::width; x++)
+		{
+			armboard::LCD::char_write_raw(1);
+		}
+
 	}
-	
 }
