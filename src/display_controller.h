@@ -36,11 +36,15 @@ public:
 	void display(DisplayInfo & content);
 	//! Schedule display test.
 	void test();
+	//! Switch the display to stand-by, turning it off until
+	//! the next time anything is written to it.
+	void standby();
 
 private:
 	void main(void);
 	void write(void);
 	void LCDTest(void);
+	void setDisplay(const unsigned byte state);
 	void writeString(const char * string, int length);
 	
 	RTOS::flag standbyFlag, testFlag;
@@ -48,6 +52,9 @@ private:
 	bool running,tested;
 	char buffer[display::height][display::width];
 	int buffLen;
+
+	const unsigned byte OFF = 0x08; //Turn off display entirely
+	const unsigned byte ON = 0x0C; //Turn display on with default settings.
 };
 
 #endif
