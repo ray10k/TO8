@@ -4,16 +4,44 @@
 #include "HallSensorListener.h"
 #include "pRTOS.h"
 
-#define HALL_PIN 7
+const int HallPin 7;
 
-class HallSensor{
+//*****************************
+//
+// class HallSensor
+//
+//! 
+//*****************************
+
+class HallSensor {
 public:
+
 	HallSensor (void);
 	void updateState (void);
-	void setListener(HallSensorListener *lst);
-	HallSensorListener *getListener (void);
+	void addListener(HallSensorListener *listener);
 	
 private:
-	HallSensorListener *theLst
-	unsigned long long int oldPulseTime, currentPulseTime;
+
+	void notifyListeners(unsigned long long int time);
+
+	// I'm assuming here that no HSL will ever be removed,
+	// and that as such, assigning via new will not lead
+	// to memory leaks.
+	class ListenerListItem
+	{
+	public:
+		ListenerListItem(HallSensorListener * listener);
+		void notify(unsigned long long int time);
+		void attach(ListenerListItem * next);
+	private:
+		HallSensorListener * l;
+		ListenerListItem * n;
+	};
+
+	ListenerListItem * firstListener;
+
+	unsigned long long int previousPulseTime;
+	bool lastReading;
 };
+
+#endif

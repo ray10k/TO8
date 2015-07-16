@@ -2,21 +2,17 @@
 #define __HalController
 
 #include "pRTOS.h"
-#indluce "HallSensor.h"
-#include "HallSensorListener.h"
+#include "HallSensor.h"
 
-class HallSensorHandler : public RTOS::task, public SensorListener{
+class HallSensorHandler : public RTOS::task{
 public:
-	HallController (int prioriteit, HallSensor &hallSensor);
-	void HallSensorPulse (HallSensor *s);
+	HallSensorHandler (HallSensor &hallSensor);
 	
 private:
 	void main (void);
+
+	HallSensor * sensor;
 	
-	HallSensor *theHallSensor;
-	RTOS::clock pulseClock;
-	RTOS::timer pulseTimer;
-	
-	short timeBetweenPulse;
-	bool setPulse;
+	RTOS::Clock ticker;
 };
+

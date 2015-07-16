@@ -1,17 +1,16 @@
 #include "HallSensorHandler.h"
 
-HallSensorHandler :: HallSensorhandler (int prioriteit, HallSensor &hallSensor):
-	RTOS::task (prioriteit, "HallSensorHandler"),
-	theHallSensor(&hallSensor),
-	pulseClock (this, 1 MS, "pulseClock"),
-	pulseTimer (this, "pulseTimer"),
-	setPulse(false)
-{
-	theHallsensor -> setListener(this);
-}
+HallSensorHandler :: HallSensorHandler(HallSensor * hallSensor):
+	RTOS::task(HallPriority, "Hall Sensor Handler"),
+	sensor(hallSensor),
+	ticker(this,1 MS,"Hall clock");
+{}
 
-void HallSensorHandler :: sensorEvent (HallSensor *s){
-	if(!setPulse){
-		pulseTimer
+void HallSensorHandler :: main ()
+{
+	while (1==1)
+	{
+		wait(); //resume once the clock ticks.
+		this -> sensor -> updateState();
 	}
 }
