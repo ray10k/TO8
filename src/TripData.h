@@ -5,11 +5,14 @@ class TripData
 {
 public:
 	TripData(int circumference);
-	int getKilometres(void);
+	int getHectometres(void);
+	int getTotalHectometres(void);
 	int getSeconds(void);
 	int getAverageSpeed(void);
 	void tick(unsigned long long int time);
+	//resets trip data, but keeps total distance.
 	void wipe(void);
+	//resets all data other than wheel circumference.
 	void reset(void);
 
 private:

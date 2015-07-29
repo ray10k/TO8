@@ -1,4 +1,3 @@
-
 //**************************************************************************
 //
 // This file contains its own documentation in Doxygen format.
