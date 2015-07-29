@@ -15,3 +15,4 @@ private:
 	
 	RTOS::Clock ticker;
 };
+#endif
