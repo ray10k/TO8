@@ -27,8 +27,6 @@ private:
 	void main(void);
 	void clockInit(void);
 	void clockUpdate(unsigned long long int now);
-	void wipeTripData(void);
-	void calcStats(void);
 	void updateDisplay(void);
 
 	RTOS::flag longPressFlag;
@@ -45,7 +43,11 @@ private:
 	unsigned int hour;
 	unsigned int minute;
 	unsigned int second;
+	unsigned long long int fraction;
+	//for standby/speed timeouts.
 	unsigned long long int lastPulse;
+	//for updating the 24-hour clock
+	unsigned long long int lastTick;
 
 	const unsigned long long int STANDBY_TIMEOUT = 5 * 60 S;
 	const unsigned long long int STANDSTILL_TIMEOUT = 5 S;

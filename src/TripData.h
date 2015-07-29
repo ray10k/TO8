@@ -9,7 +9,8 @@ public:
 	int getTotalHectometres(void);
 	int getSeconds(void);
 	int getAverageSpeed(void);
-	void tick(unsigned long long int time);
+	//takes pulse time, returns associated speed in hectometres/hour.
+	unsigned int tick(unsigned long long int time);
 	//resets trip data, but keeps total distance.
 	void wipe(void);
 	//resets all data other than wheel circumference.
