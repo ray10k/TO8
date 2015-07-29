@@ -54,5 +54,3 @@ void DisplayInfo::copyBuffer(unsigned int line, char * buffer)
 		*(buffer+i) = content[i+(display::width*line)];
 	}
 }
-
-
