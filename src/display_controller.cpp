@@ -110,8 +110,6 @@ void DisplayController::LCDTest()
 
 	}
 }
-<<<<<<< HEAD
-=======
 
 void DisplayController::setDisplay(const bool state)
 {
@@ -135,4 +133,3 @@ void DisplayController::writeString(const char * string, int length)
 		armboard::LCD::char_write_raw(*(string+i));
 	}
 }
->>>>>>> display
