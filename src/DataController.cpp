@@ -10,7 +10,9 @@ DataController::DataController (void):
 	timePool("DataTimePool"),
 	updateClock(this, 500 MS, "DataUpdateClock"),
 	currentState(NONE),
+	errored(false),
 	speed(0),
+	maxSpeed(0),
 	hour(0),
 	minute(0),
 	second(0),
@@ -113,6 +115,10 @@ void DataController::main(void)
 			unsigned long long int pulse = pulseTimeChannel.read();
 
 			speed = (currentTrip -> tick (pulse));
+			if (speed > 999)
+			{
+				errored = true;
+			}
 		}
 
 		if (what == longPressFlag)
@@ -121,9 +127,11 @@ void DataController::main(void)
 			{
 				case SPD:
 					currentTrip -> wipe();
+					errored = currentTrip -> isErrored();
 					break;
 				case ODO:
 					currentTrip -> reset();
+					errored = false;
 					break;
 				case TM:
 					currentState = NONE;
@@ -173,7 +181,28 @@ void DataController::clockUpdate(unsigned long long int now)
 	{
 		hour -= 24;
 	}
+}
 
+void writeSpeed(unsigned int speed, DisplayInfo & dest)
+{
+	char scratch[6];
+
+	sprintf(scratch,"%5u",speed);
+	dest.setChar(3,0,scratch,4);
+	dest.setChar(7,0,'.');
+	dest.setChar(8,0,scratch[4]);
+	dest.setChar(10,0,"Km/h",4);
+}
+
+void writeDistance(unsigned int distance, DisplayInfo & dest)
+{
+	char scratch[8];
+
+	sprintf(scratch, "%6u",distance);
+	dest.setChar(3,0,scratch,4);
+	dest.setChar(8,0,'.');
+	dest.setChar(9,0,scratch[5],2);
+	dest.setChar(12,0,"Km",2);
 }
 
 void DataController::updateDisplay(void)
@@ -183,42 +212,83 @@ void DataController::updateDisplay(void)
 		return; //Screen is busy, do not disturb.
 	}
 
+	errored = currentTrip -> isErrored();
+
 	DisplayInfo inf();
-	char scratch[6]; //scratch space for changing ints to chars.
+	char scratch[3]; //scratch space for changing ints to chars.
 
 	//display the clock.
 	sprintf (scratch,"%2u",hour);
-	inf.setChar(0,0,scratch,2);
-	inf.setChar(2,0,':');
+	inf.setChar(0,1,scratch,2);
+	inf.setChar(2,1,':');
 
 	sprintf (scratch,"%02u",minute);
-	inf.setChar(3,0,scratch,2);
-	inf.setChar(5,0,':');
+	inf.setChar(3,1,scratch,2);
+	inf.setChar(5,1,':');
 
 	sprintf (scratch,"%02u",second);
-	inf.setChar(6,0,scratch,2);
+	inf.setChar(6,1,scratch,2);
 
-	switch (currentState)
+	if (errored)
 	{
-		case SPD:
-
-			break;
-		case AVG:
-
-			break;
-		case MAX:
-
-			break;
-		case DST:
-
-			break;
-		case ODO:
-
-			break;
-		case TM:
-
-			break;
+		inf.setChar(4,1,"ERROR",5);
 	}
+	else
+	{
+		switch (currentState)
+		{
+			case SPD:
+				inf.setChar(0,0,"SPD",3);
 
+				writeSpeed(speed,inf);
+				
+				break;
+			case AVG:
+				inf.setChar(0,0,"AVG",3);
+				
+				unsigned int avg = this -> currentTrip -> getAverageSpeed();
+				writeSpeed(avg,inf);
 
+				break;
+			case MAX:
+				inf.setChar(0,0,"MAX",3);
+
+				writeSpeed(maxSpeed,inf);
+
+				break;
+			case DST:
+				inf.setChar(0,0,"DST",3);
+
+				unsigned int dst = this -> currentTrip -> getDecametres();
+				writeDistance(dst,inf);
+
+				break;
+			case ODO:
+				inf.setChar(0,0,"ODO",3);
+
+				unsigned int odo = this -> currentTrip -> getTotalDecametres();
+				writeDistance(odo,inf);
+
+				break;
+			case TM:
+				inf.setChar(0,0,"TM",2);
+
+				int h,m,s,temp;
+				temp = this -> currentTrip -> getSeconds();
+
+				h = temp / (60 * 60 S);
+				temp -= h * (60 * 60 S);
+
+				m = temp / (60 S);
+				temp -= m * (60 S);
+
+				s = temp;
+
+				char clockScratch[9];
+				sprintf(clockScratch,"%2u:% 2u:% 2u",h,m,s);
+				inf.setChar(2,0,clockScratch,8);
+				break;
+		}
+	}
+	//TODO: Send to display.
 }

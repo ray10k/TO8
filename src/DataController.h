@@ -39,7 +39,9 @@ private:
 	DisplayState currentState;
 	TripData * currentTrip;
 	
+	bool errored;
 	unsigned int speed;
+	unsigned int maxSpeed;
 	unsigned int hour;
 	unsigned int minute;
 	unsigned int second;

@@ -5,10 +5,11 @@ class TripData
 {
 public:
 	TripData(int circumference);
-	int getHectometres(void);
-	int getTotalHectometres(void);
-	int getSeconds(void);
-	int getAverageSpeed(void);
+	unsigned int getDecametres(void);
+	unsigned int getTotalDecametres(void);
+	unsigned int getSeconds(void);
+	unsigned int getAverageSpeed(void);
+	bool isErrorred(void);
 	//takes pulse time, returns associated speed in hectometres/hour.
 	unsigned int tick(unsigned long long int time);
 	//resets trip data, but keeps total distance.
@@ -24,7 +25,7 @@ private:
 	//trip time in uS (derived from pulse periods)
 	unsigned long long int time;
 	//wheel circumference.
-	int circumference;
+	unsigned int circumference;
 };
 
 #endif
