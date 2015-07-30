@@ -290,5 +290,5 @@ void DataController::updateDisplay(void)
 				break;
 		}
 	}
-	//TODO: Send to display.
+	DisplayController::getInstance() -> display(inf);
 }
