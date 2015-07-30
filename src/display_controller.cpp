@@ -3,6 +3,17 @@
 #include "pRTOS.h"
 #include "common.h"
 
+DisplayController DisplayController::instance = NULL;
+
+DisplayController * DisplayController::getInstance(void)
+{
+	if (instance == NULL)
+	{
+		instance = new DisplayController();
+	}
+	return instance;
+}
+
 void DisplayController::display(DisplayInfo & content)
 {
 	LCDChannel.write(content);
@@ -17,7 +28,6 @@ void DisplayController::standby()
 {
 	this -> standbyFlag.set();
 }
-
 
 void DisplayController::main(void)
 {
