@@ -119,6 +119,11 @@ void DataController::main(void)
 			{
 				errored = true;
 			}
+
+			if (maxSpeed < speed)
+			{
+				maxSpeed = speed;
+			}
 		}
 
 		if (what == longPressFlag)
@@ -128,10 +133,12 @@ void DataController::main(void)
 				case SPD:
 					currentTrip -> wipe();
 					errored = currentTrip -> isErrored();
+					maxSpeed = 0;
 					break;
 				case ODO:
 					currentTrip -> reset();
 					errored = false;
+					maxSpeed = 0;
 					break;
 				case TM:
 					currentState = NONE;
