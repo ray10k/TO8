@@ -266,14 +266,14 @@ void DataController::updateDisplay(void)
 			case DST:
 				inf.setChar(0,0,"DST",3);
 
-				unsigned int dst = this -> currentTrip -> getDecametres();
+				unsigned int dst = this -> currentTrip -> getHectometres();
 				writeDistance(dst,inf);
 
 				break;
 			case ODO:
 				inf.setChar(0,0,"ODO",3);
 
-				unsigned int odo = this -> currentTrip -> getTotalDecametres();
+				unsigned int odo = this -> currentTrip -> getTotalHectometres();
 				writeDistance(odo,inf);
 
 				break;
@@ -297,5 +297,5 @@ void DataController::updateDisplay(void)
 				break;
 		}
 	}
-	DisplayController::getInstance() -> display(inf);
+	Display.display(inf);
 }

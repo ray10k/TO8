@@ -10,14 +10,14 @@ TripData::TripData(int circumference):
 	circumference(circumference)
 	{}
 
-unsigned int TripData::getDecametres(void)
+unsigned int TripData::getHectometres(void)
 {
-	return (unsigned int) (distance / (100*10)); //need 10s of metres, distance is in cm.
+	return (unsigned int) (distance / (100*100)); //need 100s of metres, distance is in cm.
 }
 
-unsigned int TripData::getTotalDecametres(void)
+unsigned int TripData::getTotalHectometres(void)
 {
-	return (unsigned int) (totalDistance / (100*10));
+	return (unsigned int) (totalDistance / (100*100));
 }
 
 unsigned int TripData::getSeconds(void)

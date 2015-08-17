@@ -14,24 +14,12 @@
 //! Note that this class assumes that it can find the number
 //! of characters the display can take can be found in the
 //! common.h header file.
-//! Additionally, for ease of use without spawning multiple
-//! tasks, this class is implemented as a singleton.
+//
 //*************************************
 
 class DisplayController : public RTOS::task
 {
 public:
-	//! Singleton instance, to prevent having to spawn multiple tasks.
-	static DisplayController * getInstance(void);
-	//! Queues up the offered content for displaying.
-	void display(DisplayInfo & content);
-	//! Schedule display test.
-	void test();
-	//! Switch the display to stand-by, turning it off until
-	//! the next time anything is written to it.
-	void standby();
-
-private:
 	DisplayController(void) : 
 		RTOS::task(999, "display controller"),
 		standbyFlag(this,"display standby flag"), 
@@ -43,14 +31,22 @@ private:
 	 	buffLen = display::characters+display::height;
 	}	//total number of characters on display,
 		//plus one extra character per line for newline character.
+	//! Queues up the offered content for displaying.
+	void display(DisplayInfo & content);
+	//! Schedule display test.
+	void test();
+	//! Switch the display to stand-by, turning it off until
+	//! the next time anything is written to it.
+	void standby();
+
+private:
+	
 	void main(void);
 	void write(void);
 	void LCDTest(void);
 	void setDisplay(const unsigned byte state);
 	void writeString(const char * string, int length);
 
-	static DisplayController * instance;
-	
 	RTOS::flag standbyFlag, testFlag;
 	RTOS::channel<DisplayInfo,3> LCDChannel;
 	bool running,tested;
@@ -59,6 +55,6 @@ private:
 
 	const unsigned byte OFF = 0x08; //Turn off display entirely
 	const unsigned byte ON = 0x0C; //Turn display on with default settings.
-};
+}Display;
 
 #endif

@@ -10,14 +10,18 @@ const int HallPin 7;
 //
 // class HallSensor
 //
-//! 
+//! Boundary class to read out the Hall sensor.
+//
 //*****************************
 
 class HallSensor {
 public:
-
+	//! Construct a HallSensor.
 	HallSensor (void);
+	//! Check the state of the physical Hall sensor, and notify
+	//! listeners if necessary.
 	void updateState (void);
+	//! Add a listener to notify of HallSensor events.
 	void addListener(HallSensorListener *listener);
 	
 private:
@@ -42,6 +46,6 @@ private:
 
 	unsigned long long int previousPulseTime;
 	bool lastReading;
-};
+} HALL;
 
 #endif

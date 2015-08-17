@@ -1,13 +1,18 @@
 #ifndef __SensorListener
 #define __SensorListener
 
-#include "HallSensor.h"
-
-const int HallPriority = 545; //chosen at random. Seriously, why do we have to do this ourselves?
-//was "RTOS::AVAILABLE_PRIORITY++" too much trouble?!
+//****************************
+//
+// class HallSensorListener
+//
+//! interface class to allow listening for events from the Hall Sensor.
+//
+//****************************
 
 class HallSensorListener{
 public:
+	//! Called whenever the Hall Sensor is tripped. The argument is the number
+	//! of microseconds since the last pulse, measured between rising edges.
 	virtual void HallSensorPulse (unsigned long long int time) = 0;
 };
 

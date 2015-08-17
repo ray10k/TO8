@@ -3,6 +3,13 @@
 
 #define forever while(1==1)
 
+//*****************
+//
+//! Written in a misguided attempt at increasing portability.
+//! Just don't think too hard about it.
+//
+//*****************
+
 namespace display
 {
 	const unsigned int width = 16;

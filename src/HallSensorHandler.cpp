@@ -1,8 +1,8 @@
 #include "HallSensorHandler.h"
 
-HallSensorHandler :: HallSensorHandler(HallSensor * hallSensor):
+HallSensorHandler :: HallSensorHandler(HallSensor & hallSensor):
 	RTOS::task(HallPriority, "Hall Sensor Handler"),
-	sensor(hallSensor),
+	sensor(& hallSensor),
 	ticker(this,1 MS,"Hall clock");
 {}
 
