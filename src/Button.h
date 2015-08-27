@@ -14,7 +14,7 @@ public:
 	
 private:
 	const mkt_key key;
-	bool pressed;
+	bool pressed, longPress;
 	ButtonListener *theLst;
 	unsigned long long int startTime;
 };
