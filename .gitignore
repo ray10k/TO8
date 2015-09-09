@@ -19,3 +19,7 @@
 *.exe
 *.out
 *.app
+
+makefile
+mkt.py
+

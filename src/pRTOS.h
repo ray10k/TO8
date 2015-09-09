@@ -3,17 +3,16 @@
 // This file contains its own documentation in Doxygen format.
 // After running doxygen: open the rtf file; select all; r-click->update.
 //
-//! \mainpage RTOS
+//! RTOS
 //!
 //! coroutine-based tasking service with some synchronisation mechanisms
 //!
-//! \authors
+//! \authors        
 //!    - Marten Wensink (marten.wensink@hu.nl)
 //!    - Wouter van Ooijen (wouter@voti.nl)
 //!
 //! \version
-//!    V4.04 (21-4-2015)
-//!
+//!    V3.02 (2011-05-24)
 //! \if never
 //!    The version is also available as the macro RTOS_VERSION,
 //!    don't for get to updata that macro too!
@@ -24,36 +23,36 @@
 //! This RTOS provides a simple coroutine-based tasking service with
 //! a number of synchronisation mechanisms.
 //!
-//! This RTOS (Real Time Operating Stystem) is used by the courses V2RTSP1
-//! (Realtime System Programming) and V2TH08
-//! (Themaopdracht 8 Technische Informatica).
+//! This RTOS (Real Time Operating Stystem) is used by the courses V2RTSP1 
+//! (Realtime System Programming) and V2TH08 
+//! (Themaopdracht 8 Technische Informatica). 
 //!
-//! The RTOS consist of the files pRTOS.h and pRTOS.cpp.
-//! It is meant to be compiled by the mkt.py application builder,
-//! and uses some features provided by mkt.py, like chip initialization,
-//! stack allocation, and context switching.
-//! Mkt.py uses the GCC compiler to produce an executable (.hex file)
-//! for the Armboard V4.1, and download it to the board (using the
-//! serial-port-over-USB emulator), run it, and show whatever the
-//! board writes over the emeulated serial port.
-//! The executable is downloaded to Flash, so once downloaded it can be
-//! restarted by powering up the board or hitting the reset button.
-//! The Armboard has an LPC2148 ARM chip, running (by default) at 60 MHz.
-//! This chip has 512 kB FLASH and 32 kB RAM available for the application.
-//! (It has 8 kB more RAM, but this is dedicated to the USB interface,
+//! The RTOS consist of the files pRTOS.h and pRTOS.cpp. 
+//! It is meant to be compiled by the mkt.py application builder, 
+//! and uses some features provided by mkt.py, like chip initialization, 
+//! stack allocation, and context switching. 
+//! Mkt.py uses the GCC compiler to produce an executable (.hex file) 
+//! for the Armboard V4.1, and download it to the board (using the 
+//! serial-port-over-USB emulator), run it, and show whatever the 
+//! board writes over the emeulated serial port. 
+//! The executable is downloaded to Flash, so once downloaded it can be 
+//! restarted by powering up the board or hitting the reset button. 
+//! The Armboard has an LPC2148 ARM chip, running (by default) at 60 MHz. 
+//! This chip has 512 kB FLASH and 32 kB RAM available for the application. 
+//! (It has 8 kB more RAM, but this is dedicated to the USB interface, 
 //! and not used by mkt.py.)
 //!
-//! Whenever this documentation states that something is or produces an
+//! whenever this documentation states that something is or produces an 
 //! error this means that mkt_fatal will be called, which will
-//! (when the default error handler is left in place) show the error on
+//! (when the default error handler is left in place) show the error on 
 //! the serial port and on the LCD, and will blink the left and right 4 LEDs.
 //!
-//! Note that the mkt.py application builder supports dynamic allocation of
-//! memory, but not deallocation.
-//! Hence the C++ new operator can be used, but the delete operator can
-//! not be used (the application will not link if you use it).
-//! Additionally RTOS objects like tasks, waitables, clocks, timers, semaphores,
-//! etc can be allocated but not deallocated (not even on the stack).
+//! Note that the mkt.py application builder supports dynamic allocation of 
+//! memory, but not deallocation. 
+//! Hence the C++ new operator can be used, but the delete operator can 
+//! not be used (the application will not link if you use it). 
+//! Additionally RTOS objects like tasks, waitables, clocks, timers, semaphores, 
+//! etc can be allocated but not deallocated (not even on the stack). 
 //! You will get a run-time error if you try to do so.
 //!
 //! \par Files
@@ -67,7 +66,7 @@
 #ifndef __RTOS
 #define __RTOS
 
-#define RTOS_VERSION "V4.04 (2015-04-21)"
+#define RTOS_VERSION "V3.02 (2011-05-24)"
 
 // we need NULL
 #include <cstring>
@@ -81,7 +80,7 @@
 //!
 //! \par global_logging
 //!
-//! All RTOS debug logging can be switched off by defining
+//! All RTOS debug logging can be switched off by defining 
 //! \b global_logging as 0
 //! It is advised to make all application debug logging likewise
 //! dependent on this macro. Check pRTOS.cpp for examples
@@ -94,16 +93,16 @@
 //! NOTE: doing so will disable deadlock detection!
 //!
 //! \par RTOS_DEFAULT_STACK_SIZE
-//!
-//! The default stack size is 2K.
+//! 
+//! The default stack size is 2K. 
 //! You can choose another value by changing the initialization of
 //! \b RTOS_DEFAULT_STACK_SIZE.
 //!
-//! \par RTOS_MIN_PRIORITY
-//!
-//! The maximum priority value (= the lowest priority) you can
-//! assign to a task is defined by \b RTOS_MIN_PRIORITY, which is by
-//! default set to 1000.
+//! \par RTOS_MAX_PRIORITY
+//! 
+//! The maximum priority value (= the lowest priority) you can 
+//! assign to a task is defined by \b RTOS_MAX_PRIORITY, which is by
+//! default set to 10000. 
 //
 //***************************************************************************
 
@@ -113,21 +112,21 @@
 
 const unsigned int RTOS_DEFAULT_STACK_SIZE = 2048;
 
-const unsigned int RTOS_MIN_PRIORITY = 1000;
+const unsigned int RTOS_MAX_PRIORITY = 10000;
 
 
 //***************************************************************************
 //
 //! \page debug Debug logging support
 //!
-//! The mkt.py application builder supports the std::cout output stream,
-//! with most of the standard operations.
-//! The standard download procedure logs on screen what is received
+//! The mkt.py application builder supports the std::cout output stream, 
+//! with most of the standard operations. 
+//! The standard download procedure logs on screen what is received 
 //! over the serial channel, so cout can be used as debug output.
 //!
-//! The RTOS defines the trace macro, which can be used like cout,
-//! but prefixes each output with the current source file name and
-//! the current source line number. Hence (after the appropriate
+//! The RTOS defines the trace macro, which can be used like cout, 
+//! but prefixes each output with the current source file name and 
+//! the current source line number. Hence (after the appropriate 
 //! preparations) the statement
 //!
 //! \code
@@ -140,17 +139,17 @@ const unsigned int RTOS_MIN_PRIORITY = 1000;
 //! main.c:20 n=15
 //! \endcode
 //!
-//! This provides an easy way to check if and when a certain line of code
+//! This provides an easy way to check if and when a certain line of code 
 //! is executed, and optionally print some debugging information.
 //!
-//! Note that at the default baudrate (38k4) each character will
-//! take ~ 250 us, so the above line (15 characters) would take ~ 4 ms.
-//! The suggested initialization does not implement buffering, so using
-//! cout or trace can change the timing of a
+//! Note that at the default baudrate (38k4) each character will 
+//! take ~ 250 us, so the above line (15 characters) would take ~ 4 ms. 
+//! The suggested initialization does not implement buffering, so using 
+//! cout or trace can change the timing of a 
 //! task that does printing considerably.
 //!
-//! All objects (RTOS, task, event, all waitables, mutex, pool, mailbox,
-//! channel) can be printed to an ostream using the << operator.
+//! All objects (RTOS, task, event, all waitables, mutex, pool, mailbox, 
+//! channel) can be printed to an ostream using the << operator. 
 //! Printing the RTOS will print all RTOS objects.
 //
 //***************************************************************************
@@ -192,7 +191,7 @@ const char * string_allocate( const char *name );
 //! #define US * 1
 //! \endcode
 //!
-//! Time in the RTOS is expressed in microseconds.
+//! Time in the RTOS is expressed in microseconds. 
 //! Using these marco's avoids knowledge of this detail.
 //
 //***************************************************************************
@@ -207,34 +206,34 @@ const char * string_allocate( const char *name );
 //!
 //! \page non-preemptive Non-preemptive task switching
 //!
-//! The RTOS uses non-preemptive task switching.
-//! This means that the CPU can be switched to another task only
-//! when the currenly executing task (directly or indirectly)
-//! calls an RTOS function.
+//! The RTOS uses non-preemptive task switching. 
+//! This means that the CPU can be switched to another task only 
+//! when the currenly executing task (directly or indirectly) 
+//! calls an RTOS function. 
 //! Three groups of RTOS function calls can cause such a task switch:
 //!
-//! -# functions that cause the current task to become non-runnable,
+//! -# functions that cause the current task to become non-runnable, 
 //!    like task::wait(), and task::suspend()
-//! -# functions that make a higher-priority task runnable,
+//! -# functions that make a higher-priority task runnable, 
 //!    like flag::set(), and task::resume()
-//! -# the function task::release(), which only purpose is
+//! -# the function task::release(), which only purpose is 
 //!    to give up the CPU to a higher priority task.
 //!
-//! A task can be made runnable either by an excplicit action
-//! from another task, like an event_flag::set() or task::resume()
-//! call, or implicitly by the expiration of a timer.
-//! But even for the latter case (timer expiration) the switching
+//! A task can be made runnable either by an excplicit action 
+//! from another task, like an event_flag::set() or task::resume() 
+//! call, or implicitly by the expiration of a timer. 
+//! But even for the latter case (timer expiration) the switching 
 //! to another task can occur only when an RTOS function is called.
 //!
-//! The diagram below shows the state-event diagram for a task.
-//! The transitions from ready to running and back are governed
-//! by the RTOS always selecting the highest-priority runnable task.
-//! The events that cause the transitions between runnable and blocked
-//! and vice versa, and between blocked-and-suspended and suspended
-//! are the same, they are shown in the enlarged box.
-//! A task can only get blocked by doing something (wait,
-//! read a mailbox, etc), hence there is no transition
-//! from suspended to blocked-and-suspended.
+//! The diagram below shows the state-event diagram for a task. 
+//! The transitions from ready to running and back are governed 
+//! by the RTOS always selecting the highest-priority runnable task. 
+//! The events that cause the transitions between runnable and blocked 
+//! and vice versa, and between blocked-and-suspended and suspended 
+//! are the same, they are shown in the enlarged box. 
+//! A task can only get blocked by doing something (wait, 
+//! read a mailbox, etc), hence there is no transition 
+//! from suspended to blocked-and-suspended. 
 //!
 //! TBW diagram
 //
@@ -246,36 +245,36 @@ const char * string_allocate( const char *name );
 //!
 //! \page latency Latency
 //!
-//! When a task is activated by a timeout (either by a timer or clock,
-//! or because it is a periodic task) at a certain moment in time it will
-//! in general not be run at that exactly time, but at some later time.
+//! When a task is activated by a timeout (either by a timer or clock, 
+//! or because it is a periodic task) at a certain moment in time it will 
+//! in general not be run at that exactly time, but at some later time. 
 //! This delay is called the latency. Two things contribute to the latency:
 //!
-//! -# Higher priority taks will be run first, until no higher
-//!    prority taks are runnable.
-//! -# When a lower priority task is running when the timer times out
-//!    the RTOS will notice this only when one of the RTOS functions
-//!    is called that does rescheduling: task::wait(), flag::set(),
-//!    task::suspend(), task::resume(), task::release().
+//! -# Higher priority taks will be run first, until no higher 
+//!    prority taks are runnable. 
+//! -# When a lower priority task is running when the timer times out 
+//!    the RTOS will notice this only when one of the RTOS functions 
+//!    is called that does rescheduling: task::wait(), flag::set(), 
+//!    task::suspend(), task::resume(), task::release(). 
 //!
 //! The first contribution is a consequence of the design of the application.
-//! When you feel that it is inappropriate that a particular higher-priority
+//! When you feel that it is inappropriate that a particular higher-priority 
 //! task is run first and hence contributes to the latency of the task that
 //! is activated by the timer you have set the task priorities wrong.
 //!
-//! The second contribution is specific for a non-preemptive RTOS.
-//! (A preemptive RTOS would immediately stop (preempt) the running
-//! lower-priority task and switch to the higher-priority task.)
-//! When you have lower priority tasks in your system that use a
-//! lot of CPU time between the RTOS calls that do rescheduling
-//! you can insert task::release() calls.
-//! This call checks whether any timers that have timed out made a
+//! The second contribution is specific for a non-preemptive RTOS. 
+//! (A preemptive RTOS would immediately stop (preempt) the running 
+//! lower-priority task and switch to the higher-priority task.) 
+//! When you have lower priority tasks in your system that use a 
+//! lot of CPU time between the RTOS calls that do rescheduling 
+//! you can insert task::release() calls. 
+//! This call checks whether any timers that have timed out made a 
 //! higher-rpriority task runnable, and if so, switches to that task.
 //!
-//! When a task is made runnable by an explicit action of another task,
-//! for instance a task:resume() call or a flag::set() call,
-//! only the first source of delay (higher priority tasks that are
-//! runnable) is applicable, because inside such calls the RTOS will
+//! When a task is made runnable by an explicit action of another task, 
+//! for instance a task:resume() call or a flag::set() call, 
+//! only the first source of delay (higher priority tasks that are 
+//! runnable) is applicable, because inside such calls the RTOS will 
 //! immediatley switch to the highest priority runnable task.
 //
 //***************************************************************************
@@ -318,7 +317,7 @@ private:
 
       //! used by statistics clearance
    static bool must_clear;
-
+   
       //! used by statistics clearance
    static void do_statistics_clear (void);
 
@@ -327,13 +326,13 @@ private:
 
       //! the list of callabacks, in no particular order
    static callback * timerList;
-
+   
       //! add a callback
    static void add( callback * t );
 
      //! the list all tasks, highest priority first
    static task * taskList;
-
+   
       //! add a task to the \ref taskList
    static void add( task * task );
 
@@ -399,50 +398,50 @@ public:
    //! - is returned by wait()
    //! - can be compared to a waitable
    //!
-   //! The task::wait() calls return an event.
-   //! Such an event can be compared to a waitable.
+   //! The task::wait() calls return an event. 
+   //! Such an event can be compared to a waitable. 
    //! The result is true if and only if the waitable caused the event.
    //!
-   //! Events are the only RTOS objects that can be destroyed
+   //! Events are the only RTOS objects that can be destroyed 
    //! (without causing an error).
    //
    //************************************************************************
 public:
    class event {
    public:
-
+      
         //! prints an event, for debugging only
         void print( std::ostream & s ) const;
-
-        //! report wether two events are the same
+           
+        //! report wether two events are the same   
       bool operator==( const event & rhs ) const;
-
+      
       //! report whether an event corresponds to a waitable
       bool operator==( const waitable & rhs ) const;
-
-      //! report wether two events are not the same
+      
+      //! report wether two events are not the same    
       bool operator!=( const event & rhs ) const;
-
-      //! report whether an event does not correspond to a waitable
+      
+      //! report whether an event does not correspond to a waitable      
       bool operator!=( const waitable & rhs ) const;
-
+      
       //! add two waitables, result can be used in a wait() call
       //
-      //! Waitables can be added (operator+) to construct a
+      //! Waitables can be added (operator+) to construct a 
       //! 'set of waitables' as argument to a task::wait() call.
       event operator+( const event & rhs ) const;
 
    protected:
-
+      
         //! the owner task
       task * t;
-
+      
       //! the mask of this event, one bit is set
       //
       //! The bit that is set is unique among the events
       //! owned by a task.
       unsigned int mask;
-
+      
       //! constructor, used by concrete events
       event( task * t, unsigned int mask ): t( t ), mask( mask ){}
 
@@ -456,32 +455,32 @@ public:
    //
    //! abstract thing that a task can  wait for
    //
-   //! The operation clear() is provided (virtual, the default only clears
-   //! the waitable) set() is provided but private (not all waitables can
+   //! The operation clear() is provided (virtual, the default only clears 
+   //! the waitable) set() is provided but private (not all waitables can 
    //! be set by the user).
    //!
-   //! Waitable is an abstract class (there are no objects that are
-   //! just a waitable).
-   //! \ref flag, \ref timer, \ref clock and \ref channel are concrete
-   //! classes that inherit from waitable.
-   //! A waitable is always created for a particular task.
-   //! A maximum of 31 waitables can be created for each task.
-   //! (Actually the maximum is 32, but one waitable created
-   //! internally to implement the sleep() call.)
-   //! A waitable can be two states: set or cleared.
+   //! Waitable is an abstract class (there are no objects that are 
+   //! just a waitable). 
+   //! \ref flag, \ref timer, \ref clock and \ref channel are concrete 
+   //! classes that inherit from waitable. 
+   //! A waitable is always created for a particular task. 
+   //! A maximum of 31 waitables can be created for each task. 
+   //! (Actually the maximum is 32, but one waitable created 
+   //! internally to implement the sleep() call.) 
+   //! A waitable can be two states: set or cleared. 
    //! A waitable is initially cleared.
    //!
-   //! A task can wait for one, a subset, or all waitables created for it.
-   //! The default is to wait for all waitables created for the task,
-   //! the other variants are specified by supplying to the task:wait()
-   //! call either a single waitable, or the sum (operator+) of the
-   //! waitables you want to wait for. When one of the waitables that
-   //! is waited for is or becomes set the wait() call clears that
-   //! waitable and returns an event that compares equal to the waitable.
-   //! (Note that some waitables, for instance the channel,
-   //! can immediately set itself again.) The calling task can compare
-   //! that event to the waitables to see which event happened.
-   //! When more than one of the waited-for waitables is set the wait()
+   //! A task can wait for one, a subset, or all waitables created for it. 
+   //! The default is to wait for all waitables created for the task, 
+   //! the other variants are specified by supplying to the task:wait() 
+   //! call either a single waitable, or the sum (operator+) of the 
+   //! waitables you want to wait for. When one of the waitables that 
+   //! is waited for is or becomes set the wait() call clears that 
+   //! waitable and returns an event that compares equal to the waitable. 
+   //! (Note that some waitables, for instance the channel, 
+   //! can immediately set itself again.) The calling task can compare 
+   //! that event to the waitables to see which event happened. 
+   //! When more than one of the waited-for waitables is set the wait() 
    //! call makes an arbitrary choice from these waitables.
    //
    //************************************************************************
@@ -491,17 +490,17 @@ public:
 
       //! clear the waitable
       //
-      //! This is automatically doen when the waitable
+      //! This is automatically doen when the waitable 
       //! causes a task::wait() call to return it.
       virtual void clear( void ){ t->waitables.clear( *this ); }
 
    protected:
-
+      
         //! constructor, specify owner and name
         //
         //! The name is used for debugging only.
       waitable( task * task , const char *name );
-
+      
       //! set the waitable
       void set ( void ){ t->waitables.set( *this ); }
 
@@ -517,29 +516,29 @@ public:
    //
    //! basic synchronisation mechanism.
    //
-   //! The basic synchronization mechanism is the (event) flag.
-   //! Like all waitables, a flag is created for a particular task.
-   //! A flag is set by a flag::set() call (or the task::set( flag)
-   //! call, which has the same effect).
-   //! Like all waitables, when a task is waiting for a flag
-   //! (using a task::wait call) and that flag becomes set,
-   //! the wait call will clear the flag, and return an event
-   //! that compares equal to the flag.
-   //! Note that a flag does not count: setting a flag that is
+   //! The basic synchronization mechanism is the (event) flag. 
+   //! Like all waitables, a flag is created for a particular task. 
+   //! A flag is set by a flag::set() call (or the task::set( flag) 
+   //! call, which has the same effect). 
+   //! Like all waitables, when a task is waiting for a flag 
+   //! (using a task::wait call) and that flag becomes set, 
+   //! the wait call will clear the flag, and return an event 
+   //! that compares equal to the flag. 
+   //! Note that a flag does not count: setting a flag that is 
    //! already set has no effect on the flag.
    //!
    //! A flag must be created for a specific task.
    //! The normal place to do this is in the task's creator.
    //! An flag is initially cleared.
    //!
-   //! The example below shows a led_task that responds to two event flags.
-   //! The shift flag will cause it to shift the pattern on the LEDs one
-   //! position to the left, while the invert flag will cause it
-   //! to invert the pattern.
-   //! Two addional tasks do notghing but set these flags at fixed intervals.
-   //! The result is a sort of one-direction Kitt display,
-   //! which will occasionally flip polarity.
-   //! Note that in this example the wait call excplicitly
+   //! The example below shows a led_task that responds to two event flags. 
+   //! The shift flag will cause it to shift the pattern on the LEDs one 
+   //! position to the left, while the invert flag will cause it 
+   //! to invert the pattern. 
+   //! Two addional tasks do notghing but set these flags at fixed intervals. 
+   //! The result is a sort of one-direction Kitt display, 
+   //! which will occasionally flip polarity. 
+   //! Note that in this example the wait call excplicitly 
    //! mentions the flags it waits for.
    //!
    //! \code
@@ -551,29 +550,29 @@ public:
 public:
    class flag : public waitable {
    public:
-
+      
         //! constructor, specify onwer and name
         //
-        //! This call creates a timer for task t.
+        //! This call creates a timer for task t. 
         //! The name is used for debugging and statistics.
       flag( task * t, const char *name = "" );
-
+      
       //! sets the flag
       //
       //! Setting a flag causes the task that waits for this
-      //! flag to be awakened.
+      //! flag to be awakened.      
       void set ( void );
-
+      
       //! prints flag infomation (for debugging)
       void print( std::ostream & s, bool header = true ) const;
 
    private:
-
+      
         // this information is needed for statistics only
       RTOS_STATISTICS( flag *next_flag; )
       RTOS_STATISTICS( unsigned int n_sets; )
       RTOS_STATISTICS( unsigned int n_gets; )
-
+      
       friend class RTOS;
    };
 
@@ -619,51 +618,51 @@ private:
    //
    //! an independent thread of execution
    //
-   //! A task is an independent thread of execution, using its own stack.
-   //! Tasks share the single CPU, so only one task can be running at any time.
-   //! The RTOS determines which task is running.
-   //! A task has two bi-value states that determine whether
-   //! the task is runnable: the suspended/resumed flag and the
-   //! waiting/non-waiting flag.
-   //! A task is runnable only when it is both resumed, and non-waiting.
-   //! When a task is created it is resumed and non-waiting.
-   //! ll tasks (and the RTOS code) run in the same memory space,
-   //! without protection from each other.
-   //! So a 'wild pointer' in one task can destroy data in
-   //! another task, or even in the RTOS.
-   //!
-   //! Each task is created with a fixed priority, which can be any
-   //! unsigend integer value below RTOS_MAX_PRIORITY (by default 10_000).
+   //! A task is an independent thread of execution, using its own stack. 
+   //! Tasks share the single CPU, so only one task can be running at any time. 
+   //! The RTOS determines which task is running. 
+   //! A task has two bi-value states that determine whether 
+   //! the task is runnable: the suspended/resumed flag and the 
+   //! waiting/non-waiting flag. 
+   //! A task is runnable only when it is both resumed, and non-waiting. 
+   //! When a task is created it is resumed and non-waiting. 
+   //! ll tasks (and the RTOS code) run in the same memory space, 
+   //! without protection from each other. 
+   //! So a 'wild pointer' in one task can destroy data in 
+   //! another task, or even in the RTOS. 
+   //!    
+   //! Each task is created with a fixed priority, which can be any 
+   //! unsigend integer value below RTOS_MAX_PRIORITY (by default 10_000). 
    //! After creation the priority can not be changed.
-   //! The value 0 indicates the highest task priority, a higher number
-   //! indicates a lower priority.
-   //! Each task must have a unqiue priority, it is an error to create
-   //! a task with same priority as an existing task.
-   //! You can omit the priority, in which case the RTOS will
-   //! select an unused priority starting at RTOS_MAX_PRIORITY
+   //! The value 0 indicates the highest task priority, a higher number 
+   //! indicates a lower priority. 
+   //! Each task must have a unqiue priority, it is an error to create 
+   //! a task with same priority as an existing task. 
+   //! You can omit the priority, in which case the RTOS will 
+   //! select an unused priority starting at RTOS_MAX_PRIORITY 
    //! (in other words, it will choose a low priority for your task).
-   //!
-   //! Each task has its own stack.
-   //! You can specify the size of the stack at task creation.
-   //! If you omit the stack size, RTOS_DEFAULT_STACK_SIZE will be used
-   //! (default: 2 Kb).
-   //! This will be enough for most tasks, if you take care not to
-   //! allocate big things on the stack, and avoid very deep nesting
+   //! 
+   //! Each task has its own stack. 
+   //! You can specify the size of the stack at task creation. 
+   //! If you omit the stack size, RTOS_DEFAULT_STACK_SIZE will be used 
+   //! (default: 2 Kb). 
+   //! This will be enough for most tasks, if you take care not to 
+   //! allocate big things on the stack, and avoid very deep nesting 
    //! (watch out for recursion!).
-   //!
-   //! A task is created by instatiating a class that derives from
-   //! RTOS::task and supplies a main().
-   //! This main() should never return.
-   //! The fragment below shows how you can do this.
-   //! The task name is used for statistics and debugging.
-   //! As shown for the name, it might be wise to get the task parameters
+   //! 
+   //! A task is created by instatiating a class that derives from 
+   //! RTOS::task and supplies a main(). 
+   //! This main() should never return. 
+   //! The fragment below shows how you can do this. 
+   //! The task name is used for statistics and debugging. 
+   //! As shown for the name, it might be wise to get the task parameters 
    //! as arguments to the constructor of your task.
    //!
-   //! \code
+   //! \code 
    //! class my_task_class : public RTOS::task {
    //! public:
-   //!    my_task_class( const char *name ):
-   //!       task(
+   //!    my_task_class( const char *name ): 
+   //!       task( 
    //!          name,  // name of the task
    //!          10,    // task priority
    //!          4096   // task stack size
@@ -677,17 +676,17 @@ private:
    //! my_task_class my_task( "my second task" );
    //! \endcode
    //!
-   //! The example below is a complete program that shows the
-   //! standard part (initialization, and a main that calls
-   //! RTOS::run()), a function for writing to an individual LED,
-   //! a task class that blinks a LED, and two instatiations of
-   //! this class.
-   //! Note that the sleep() call is used instead of mkt_wait_ms
-   //! or mkt_wait_us. Sleep() causes other tasks to run while
-   //! this task is waiting, whereas the mkt_wait_* calls would
+   //! The example below is a complete program that shows the 
+   //! standard part (initialization, and a main that calls 
+   //! RTOS::run()), a function for writing to an individual LED, 
+   //! a task class that blinks a LED, and two instatiations of 
+   //! this class. 
+   //! Note that the sleep() is call used instead of mkt_wait_ms 
+   //! or mkt_wait_us. Sleep() causes other tasks to run while 
+   //! this taks is waiting, whereas the mkt_wait_* calls would 
    //! use monopolize the CPU to do a busy wait.
    //!
-   //! Subsequent examples will not show the standard
+   //! Subseqent examples will not show the standard 
    //! initialization (the part up to the comment line).
    //!
    //! \code
@@ -695,25 +694,25 @@ private:
    //! #configure clcd_lines   2
    //! #configure memory       rom
    //! #configure baudrate     38400
-   //!
+   //! 
    //! #include "pRTOS.h"
-   //!
+   //! 
    //! int main( void ){
    //!    RTOS::run();
    //!    return 0;
    //! }
-   //!
+   //! 
    //! // end of standard part
-   //!
+   //! 
    //! void led_set( int n, int v ){
-   //!    static int leds = 0;
+   //!    static int leds = 0;   
    //!    if( v ){ leds |= 1 << n; } else { leds &=~ 1 << n; }
    //!    mkt_leds_write( leds );
    //! }
-   //!
+   //! 
    //! class blinker : public RTOS::task {
    //! public:
-   //!    blinker( int LED, int period ):
+   //!    blinker( int LED, int period ): 
    //!       LED( LED ), period( period ){}
    //! private:
    //!    int LED, period;
@@ -726,26 +725,26 @@ private:
    //!       }
    //!    }
    //! };
-   //!
+   //! 
    //! blinker led0( 0, 1000 MS );
    //! blinker led1( 1,  300 MS );
    //! \endcode
    //!
    //! A task can be suspended and resumed by the task::suspend()
-   //! and task::resume() calls.
-   //! The suspend/resume state does not count the number of suspends
-   //! and resumes: a suspend call on an already suspended task
-   //! (or a resume on an already resumed task) has no effect.
-   //! Suspend and resume are intended for use by the application code:
-   //! the RTOS will never suspend or resume a task.
-   //! (The RTOS uses the waiting/non-waiting state, which can
+   //! and task::resume() calls. 
+   //! The suspend/resume state does not count the number of suspends 
+   //! and resumes: a suspend call on an already suspended task 
+   //! (or a resume on an already resumed task) has no effect. 
+   //! Suspend and resume are intended for use by the application code: 
+   //! the RTOS will never suspend or resume a task. 
+   //! (The RTOS uses the waiting/non-waiting state, which can 
    //! not be changed directly by the application.)
    //!
-   //! The example below shows one task that beeps the speaker at 1 kHz,
-   //! while the other taks suspends and resumes the first task to make
-   //! it beep 5 times, after which it suspends itself, which ends all
-   //! activity.
-   //! (This will trigger the RTOS deadlock detection, because a normal
+   //! The example below shows one task that beeps the speaker at 1 kHz, 
+   //! while the other taks suspends and resumes the first task to make 
+   //! it beep 5 times, after which it suspends itself, which ends all 
+   //! activity. 
+   //! (This will trigger the RTOS deadlock detection, because a normal 
    //! embedded application should never terminate.)
    //!
    //! \code
@@ -764,7 +763,7 @@ private:
    //!    }
    //! };
    //! beeper speaker( 10 );
-   //!
+   //! 
    //! class suspender : public RTOS::task {
    //!    void main( void ){
    //!       for( int i = 0; i < 5 ; i++ ){
@@ -776,11 +775,11 @@ private:
    //!       suspend();
    //!    }
    //! };
-   //! suspender task2;
+   //! suspender task2; 
    //! \endcode
 
 
-
+   
    // A task is created by inheriting
    // from task and providing a main() function. Initialisation of the task,
    // including creating its waitables, should be done in the constructor.
@@ -801,7 +800,7 @@ private:
    // Hence the longest run time between such calls determines the granularity
    // (timewise responsiveness) of the application.
    // Within a timeconsuming computation a task can call release() to have
-   // the RTOS serve the timers.
+   // the RTOS serve the timers.   
    //
    //************************************************************************
 
@@ -833,8 +832,8 @@ public:
       //! task body, must be provided by a derived class
       //
       //! A task is created by inheriting
-      //! from task and providing a main() function.
-      //! Initialisation of the task, including creating its waitables,
+      //! from task and providing a main() function. 
+      //! Initialisation of the task, including creating its waitables, 
       //! should be done in the constructor.
       //! Don't forget to call the constructor of the task class!
       //!
@@ -842,7 +841,7 @@ public:
       //!
       //! Each task has a unique priority (an unsigned integer).
       //! A lower value indicates a higher priority.
-      //! The RTOS scheduler will always run the task with the
+      //! The RTOS scheduler will always run the task with the 
       //! higest-priority runnable (neither blocked nor suspended) task.
       //! A task runs until it changes this 'situation' by using an RTOS
       //! call that changes its own state to not runnable, or the state of a
@@ -850,13 +849,13 @@ public:
       //!
       //! Timers are served only when the RTOS is activated
       //! by calling any of its state-changing interfaces.
-      //! Hence the longest run time between such calls determines the
+      //! Hence the longest run time between such calls determines the 
       //! granularity (timewise responsiveness) of the application.
-      //! Within a timeconsuming computation a task can call release()
-      //! to have the RTOS serve the timers.
+      //! Within a timeconsuming computation a task can call release() 
+      //! to have the RTOS serve the timers.      
    virtual void main( void ) = 0;
-
-   private:
+      
+   private:   
 
       // must call main()
       friend void task_trampoline( void );
@@ -865,18 +864,18 @@ public:
 
       //! constructor, specify priority, name and stacksize
       //
-      //! Priorities are reasonably-valued (below RTOS_MIN_RIORITY)
-      //! unsigned integers. 0 is te highest priority.
-      //! Priorities must be unqiue.
-      //! The default causes the constructor to choose a free priority
-      //! starting at RTOS_MIN_PRIORITY (default: 1000).
+      //! Priorities are reasonably-valued (below RTOS_DEFAULT_RIORITY)
+      //! unsigned integers. 0 is te highest priority. 
+      //! Priorities must be unqiue. 
+      //! The default causes the constructor to choose a free priority 
+      //! starting at RTOS_DEFAULT_PRIORITY (default: 10000). 
       //!
-      //! The name is used for debugging and statistics.
+      //! The name is used for debugging and statistics. 
       //!
-      //! A stack of stack_size bytes is allocated for the task.
+      //! A stack of stack_size bytes is allocated for the task. 
       //! The default is 2 kB.
       task(
-         unsigned int priority  = RTOS_MIN_PRIORITY,
+         unsigned int priority  = RTOS_MAX_PRIORITY,
          const char * tname     = "",
          unsigned int stacksize = RTOS_DEFAULT_STACK_SIZE
       );
@@ -888,16 +887,16 @@ public:
 
       //! suspend a task (prevent execution until a resume)
       //
-      //! Suspends the task (prevents execution).
-      //! Has no effect when the task is already suspended.
+      //! Suspends the task (prevents execution). 
+      //! Has no effect when the task is already suspended. 
       //! Can be extended by an application task.
       //!
-      //! A concrete task can extend this operation to suit its needs.
+      //! A concrete task can extend this operation to suit its needs.      
       virtual void suspend( void );
-
+      
       //! continue a suspended task
       //
-      // Resumes the task (cancels a suspension).
+      // Resumes the task (cancels a suspension).  
       //! Has no effect when the task is not suspended.
       //!
       //! Can be extended by an application task to suit its needs.
@@ -905,27 +904,27 @@ public:
 
       //! release the CPU to the scheduler
       //
-      //! Sevices timers and releases the CPU to a higher
+      //! Sevices timers and releases the CPU to a higher 
       //! priority task if one became ready.
       void release( void );
 
       //! wait for some time
       //
       //! Sleeps the task (prevents execution) for the indicated time.
-      void sleep( long int time );
+      void sleep( unsigned int time );
 
       //! report the task priority
       unsigned int priority( void ) const   { return task_priority; }
-
+      
       //! report the task name
       const char * name( void ) const;
-
+      
       //! report whether the task is currently suspended
       bool is_suspended( void ) const       { return task_is_suspended; }
-
-      //! report whether the task is currently blocked
+      
+      //! report whether the task is currently blocked      
       bool is_blocked( void ) const         { return task_is_blocked; }
-
+      
       //! report whether the task is currently ready for execution
       bool is_ready( void ) const {
          return !( task_is_suspended || task_is_blocked );
@@ -936,28 +935,28 @@ public:
 
       //! print task statistics
       void print( std::ostream & stream, bool header = true ) const;
-
+                  
       //! wait for all waitables created for this task
       //
-      //! Wait (prevent execution) until at least one of the waitables
-      //! is set. Return and clear that waitable.
+      //! Wait (prevent execution) until at least one of the waitables 
+      //! is set. Return and clear that waitable. 
       //! Three variants for the parameter:
       //!
-      //! - The default (no parameter) waits for all waitables
+      //! - The default (no parameter) waits for all waitables 
       //!   defined for the task.
       //! - One waitable as argument waits for that specific waitable.
       //! - The addition (operator+) of waitables: wait for any one of
       //!   those waitables.
       //!
-      //! It is an error to wait for waitables that have not been created
+      //! It is an error to wait for waitables that have not been created 
       //! for this task.
       event wait( void ){ return waitables.wait(); }
-
+      
       //! wait for a single waitable
       //
       //! @copydetails wait
       event wait( const waitable & w ){ return waitables.wait( w ); }
-
+      
       //! wait for a set of waitables
       //
       //! @copydetails wait
@@ -972,8 +971,8 @@ public:
       //! the current task activation as far as statistics is concerned.
       //! You can use this to avoid pullution of your task statistics
       //! with the timing effects of debug logging. But make sure you
-      //! don't use it in the 'normal' execution paths, because that would
-      //! make the statistics lie to you.
+      //! don't use it in the 'normal' execution paths, becaue that would 
+      //! make the statitics lie to you.
       void ignore_activation_time( void ){
          ignore_this_activation = true;
       }
@@ -998,7 +997,7 @@ public:
       //! statistics
       int activated;
       int latency_max;
-      unsigned long int runtime_max;
+      int runtime_max;
       int activations;
       bool ignore_this_activation;
 
@@ -1051,12 +1050,12 @@ private:
       void start( long int time ){ time_to_wait = time; }
 
       // the callback must fire <time> from the last firing
-      void restart( long int time ){
+      void restart( unsigned long long int time ){
          while( time_to_wait <= 0 ){ time_to_wait += time; }
       }
 
       // abort a started timer
-      virtual void cancel( void ) { time_to_wait = 0; }
+      virtual void cancel( void ){ time_to_wait = 0; }
 
       RTOS_STATISTICS( const char * object_name; )
 
@@ -1079,23 +1078,23 @@ private:
    //
    //! one-short timer
    //
-   //! A (one-shot) timer is a special type of flag, which can be
-   //! instructed to set itself after a fixed amount of time.
-   //! The amount of time is supplied with the timer::set() call.
-   //! This call starts the timer.
-   //! A timer that is running (waiting for its timeout to expire)
-   //! can be canceled by the timer::cancel() call.
-   //! When a timer that is already running is set again the previous
-   //! timeout is overwritten by the new one.
-   //! The suspend/resume state of its owner taks has no effect on
-   //! a timer: even when the task is suspended the timer will run
-   //! to its timeout and set isetlf.
+   //! A (one-shot) timer is a special type of flag, which can be 
+   //! instructed to set itself after a fixed amount of time. 
+   //! The amount of time is supplied with the timer::set() call. 
+   //! This call starts the timer. 
+   //! A timer that is running (waiting for its timeout to expire) 
+   //! can be canceled by the timer::cancel() call. 
+   //! When a timer that is already running is set again the previous 
+   //! timeout is overwritten by the new one. 
+   //! The suspend/resume state of its owner taks has no effect on 
+   //! a timer: even when the task is suspended the timer will run 
+   //! to its timeout and set isetlf. 
    //! But of course the task, being suspended, will not be able to react.
    //!
-   //! The example below again (like the flags example) produces
-   //! a left-shifting polarity-flipping Kitt display, but the
-   //! actions are now caused by two timers inside the one task.
-   //! Note that these timers must be started initially,
+   //! The example below again (like the flags example) produces 
+   //! a left-shifting polarity-flipping Kitt display, but the 
+   //! actions are now caused by two timers inside the one task. 
+   //! Note that these timers must be started initially, 
    //! and must be re-started after each timeout.
    //!
    //! \code
@@ -1107,21 +1106,21 @@ private:
 public:
    class timer : public waitable, public callback {
    public:
-
+      
         //! create a timer for task t, specify its name
       timer( task * t, const char *name = "" );
-
+      
       //! set the timer to timeout after the specified time
       //
-      //! Start the timer: it will set itself after the indicated timeout,
-      //! starting from now.
-      //! When the timer was already running the previous timout
+      //! Start the timer: it will set itself after the indicated timeout, 
+      //! starting from now. 
+      //! When the timer was already running the previous timout 
       //! is overwritten.
-      void set( long int time );
-
+      void set( unsigned long long int time );
+      
       //! stop and clear the timer
       //
-      //! Stop the timer (when it was running),
+      //! Stop the timer (when it was running), 
       //! and clears its (when it was set).
       void cancel( void );
 
@@ -1129,9 +1128,7 @@ public:
       void print( std::ostream & s, bool header = true ) const;
 
    private:
-      void start( long int time );
       void time_up( void ){ waitable::set(); }
-
       RTOS_STATISTICS( timer *next_timer; )
       RTOS_STATISTICS( unsigned int n_sets; )
       RTOS_STATISTICS( unsigned int n_cancels; )
@@ -1144,17 +1141,17 @@ public:
    //
    //! free-running clock, ticks at a fixed frequency
    //
-   //! A clock is a waitable which is automatically sets itself
-   //! at fixed intervals.
-   //! The interval between these moments is specified when the
-   //! clock is created.
-   //! A clock is always running, even when the task to which it
+   //! A clock is a waitable which is automatically sets itself 
+   //! at fixed intervals. 
+   //! The interval between these moments is specified when the 
+   //! clock is created. 
+   //! A clock is always running, even when the task to which it 
    //! belongs is suspended.
-   //!
-   //! The example below again shows the left-shifting and polarity
-   //! flipping Kitt display, but the actions are now caused by two
-   //! clocks.
-   //! Note that unlike the timers examples the clocks are never
+   //! 
+   //! The example below again shows the left-shifting and polarity 
+   //! flipping Kitt display, but the actions are now caused by two 
+   //! clocks. 
+   //! Note that unlike the timers examples the clocks are never 
    //! explictly started.
    //!
    //! \code
@@ -1166,31 +1163,30 @@ public:
 public:
    class clock :  public waitable, public callback {
    public:
-
+      
         //! create a clock for task t, specify interval and name
         //
         //! The name is used for debugging and statistics.
-      clock(
-         task * t,
-         long int interval,
-         const char *name = ""
+      clock( 
+         task * t, 
+         unsigned long long int interval, 
+         const char *name = "" 
       );
-
+      
       //! clear the waitable within the clock
       //
       //! Note that this does not stop the clock.
       void clear( void ){ waitable::clear(); }
-
-      //! the interval of the timer
-      long int interval( void ){ return _interval; }
+         
+      //! the interval of the timer    
+      unsigned int interval( void ){ return _interval; }
 
       //! print the clock (for debugging)
       void print( std::ostream & s, bool header = true ) const;
 
    private:
       void time_up( void );
-      long int _interval;
-
+      unsigned int _interval;
       RTOS_STATISTICS( clock *next_clock; )
       RTOS_STATISTICS( unsigned int ticks; )
 
@@ -1231,27 +1227,27 @@ public:
    //! place to store and rectrieve data, no built-in synchronisation
    //
    //! A (communication) pool is a template class that stores a single value.
-   //! It supports the read and write operations, which are guaranteed to be
-   //! atomic. (On a non-preemptive RTOS every assignment is atomic,
+   //! It supports the read and write operations, which are guaranteed to be 
+   //! atomic. (On a non-preemptive RTOS every assignment is atomic, 
    //! but the pool template is still usefull to make it explicit that
-   //! data is transferred between tasks.)
-   //! A pool is just a variable.
+   //! data is transferred between tasks.) 
+   //! A pool is just a variable. 
    //!
-   //! The example below demonstrates the use of a pool to
-   //! maintain a seconds-since-startup counter.
-   //! Note that the call RTOS::runtime() returns the time elapsed since
-   //! startup, so there is no need to maintain a
+   //! The example below demonstrates the use of a pool to 
+   //! maintain a seconds-since-startup counter. 
+   //! Note that the call RTOS::runtime() returns the time elapsed since 
+   //! startup, so there is no need to maintain a 
    //! seconds-since-startup this way yourself.
    //!
    //! \code
-   //!
+   //! 
    //! pool< unsigned int > seconds;
-   //!
-   //! void show_time( void ){
+   //! 
+   //! void show_time( void ){ 
    //!    unsigned int n = seconds.read();
    //!    std::cout << ( seconds / 60 ) % 60 << ":" << seconds % 60;
    //! }
-   //!
+   //! 
    //! class seconds_counter_class : public periodic_task {
    //!    seconds_counter( void ){
    //!       periodic_task::periodic_task( "sec-counter", 10, 1000 MS );
@@ -1264,9 +1260,9 @@ public:
    //!       }
    //!    }
    //! }
-   //!
+   //!    
    //! seconds_counter_class seconds_counter;
-   //!
+   //!    
    //! \endcode
    //
    //************************************************************************
@@ -1274,13 +1270,13 @@ public:
 public:
    template <class T> class pool : public pool_base {
    public:
-
+      
         //! construct a pool, specify its name (for debgging only)
         //
-      //! Use it to make (global) variables use for communication
-      //! between tasks explicit.
+      //! Use it to make (global) variables use for communication 
+      //! between tasks explicit.    
       //!
-      //! The template argument T must be a class that has a
+      //! The template argument T must be a class that has a 
       //! non-arguments constructor and supports assignment.
       pool( const char *name = "" ): pool_base( name ){}
 
@@ -1292,7 +1288,7 @@ public:
       //! operation on anything is always atomic, unless the implementation
       //! of that operating somehow invokes the RTOS.
       //! But for clearness it is a good idea to implement such task-global
-      //! data as pools.
+      //! data as pools.        
       void write (T item) {
          RTOS_STATISTICS( reads++; )
          data = item;
@@ -1317,30 +1313,30 @@ public:
    //
    //! mutual execlusion semaphore
    //
-   //! A mutex (mutual exclusion semaphore) is a synchronization mechanism
-   //! that is used to give a task exclusive access to some resource:
-   //! the task can execute a sequence of statements, being sure that
-   //! no other task is accessing the same resource.
+   //! A mutex (mutual exclusion semaphore) is a synchronization mechanism 
+   //! that is used to give a task exclusive access to some resource: 
+   //! the task can execute a sequence of statements, being sure that 
+   //! no other task is accessing the same resource. 
    //!
    //! A typical use is to protect a resource (for instance global data)
    //! that should be used by only one task at a time, so it can update
-   //! it and leave it in a consistent state.
-   //!
+   //! it and leave it in a consistent state.   
+   //! 
    //! A mutex is not created for a particular task, and it is not a waitable.
-   //!
-   //! Initially a mutex is free.
-   //! The mutex::wait() operation blocks the task until the mutex is free,
-   //! and then claims the mutex for the executing task.
-   //! The mutex::signal() operation frees the mutex again.
-   //! It is an error to call mutex::signal on a mutex that is not
+   //! 
+   //! Initially a mutex is free. 
+   //! The mutex::wait() operation blocks the task until the mutex is free, 
+   //! and then claims the mutex for the executing task. 
+   //! The mutex::signal() operation frees the mutex again. 
+   //! It is an error to call mutex::signal on a mutex that is not 
    //! currently owned by the executing task.
    //!
-   //! The example below shows two tasks that write messages to the
-   //! LCD display. Each task writes to its own line.
-   //! For the demonstration, after each LCD operation a sleep()
-   //! is put to allow the other tasks to run.
-   //! A mutex prevents the other task from accessing the LCD
-   //! while the first one is still using it.
+   //! The example below shows two tasks that write messages to the 
+   //! LCD display. Each task writes to its own line. 
+   //! For the demonstration, after each LCD operation a sleep() 
+   //! is put to allow the other tasks to run. 
+   //! A mutex prevents the other task from accessing the LCD 
+   //! while the first one is still using it. 
    //!
    //! \code
    //! TBW
@@ -1351,39 +1347,39 @@ public:
 public:
    class mutex {
    public:
-
+      
         //! constructor, specify the name
         //
         //! The name is used for debugging only.
       mutex( const char *name = "" );
-
+      
       //! generates an error
       //
       //! A mutex should never be destroyed
-      ~mutex( void );
-
+      ~mutex( void );  
+      
       //! prints a mutex, for debugging only.
       void print( std::ostream & stream, bool header = true ) const;
 
       //! claim the mutex
+      //!      
+      //! If the mutex was set it it is now cleared, 
+      //! and the calling task owns the mutex. 
       //!
-      //! If the mutex was set it it is now cleared,
-      //! and the calling task owns the mutex.
-      //!
-      //! Otherwise the current task waits (is halted) until the
-      //! owning task calls signal() on the same mutex.
-      //! The signal() calls will release the tasks in
+      //! Otherwise the current task waits (is halted) until the 
+      //! owning task calls signal() on the same mutex. 
+      //! The signal() calls will release the tasks in 
       //! the order of their wait() calls.
       void wait   (void);
-
+      
       //! release the mutex
       //
-      //! If one or more tasks are waiting for the mutex the fires
-      //! one is released, and it now owns the mutex.
-      //! Otherwise, if the mutex is cleared it is now set.
-      //!
-      //! It is an error for a task to call signal() on a
-      //! mutex that it does not own (that it did not call wait() on).
+      //! If one or more tasks are waiting for the mutex the firs 
+      //! one is released, and it now owns the mutex. 
+      //! Otherwise, if the mutex is cleared it is now set. 
+      //! 
+      //! It is an error for a task to call signal() on a 
+      //! mutex that it does not own (that it did not call wait() on). 
       //! After the signal the task no longer owns the mutex.
       void signal (void);
 
@@ -1410,7 +1406,7 @@ public:
 public:
    class mailbox_base {
    public:
-      mailbox_base( const char * name );
+      mailbox_base( const char *name );
 
       ~mailbox_base( void ) {
          mkt_fatal (#UNIQUE_ERROR); // mailbox destructor called
@@ -1418,16 +1414,13 @@ public:
 
       void print( std::ostream & s, bool header = true ) const;
 
-      task * writer;
-      task * reader;
-
+      task * client;
    #if RTOS_STATISTICS_ENABLED
       const char * mailbox_name;
       unsigned int writes;
-      unsigned int reads;
-      mailbox_base * next_mailbox;
+      mailbox_base *next_mailbox;
    #endif
-
+   
    };
 
    //************************************************************************
@@ -1437,26 +1430,26 @@ public:
    //
    //! synchronous handling over of a data item
    //
-   //! A mailbox is a template class synchronization mechanism.
-   //! A single value can be written to the mailbox.
-   //! Another task can read the value from the mailbox.
-   //! The read and write calls each wait on each other before they
+   //! A mailbox is a template class synchronization mechanism. 
+   //! A single value can be written to the mailbox. 
+   //! Another task can read the value from the mailbox. 
+   //! The read and write calls each wait on each other before they 
    //! are allowed to proceed.
-   //! A mailbox is not created for a particular task,
+   //! A mailbox is not created for a particular task, 
    //! and it is not a waitable.
    //!
-   //! Initially a mailbox is empty.
-   //! The \ref write() operation bloks the calling task until
-   //! the mailbox is empty, then writes to the mailbox, and blocks.
-   //! The \ref read() operation blocks the calling task until
-   //! there is a value in the mailbox.
-   //! Then it reads the value, unblocks the task that wrote to
-   //! the mailbox, and returns.
+   //! Initially a mailbox is empty. 
+   //! The \ref write() operation bloks the calling task until 
+   //! the mailbox is empty, then writes to the mailbox, and blocks. 
+   //! The \ref read() operation blocks the calling task until 
+   //! there is a value in the mailbox. 
+   //! Then it reads the value, unblocks the task that wrote to 
+   //! the mailbox, and returns. 
    //!
-   //! The example below uses a mailbox to buffer writing cout
-   //! data to the UART. The function that writes each cout character
-   //! writes it to a mailbox, which is read by the  UART task.
-   //! This task waits 2 MS after each write to the UART,
+   //! The example below uses a mailbox to buffer writing cout 
+   //! data to the UART. The function that writes each cout character 
+   //! writes it to a mailbox, which is read by the  UART task. 
+   //! This task waits 2 MS after each write to the UART, 
    //! to avoid busy waiting.
    //!
    //! \code
@@ -1468,64 +1461,59 @@ public:
 public:
    template <class T> class mailbox : mailbox_base {
    public:
-
-      //! constructor, specify mailbox name
-      //
-      //! Create a mailbox. The mailbox is initially empty.
-      // The name is used for debugging and statistics.
+      
+        //! construtor, specify mutex name
+        //
+        //! Create a mutex. The mutex is initially set. 
+        // The name is used for debugging and statistics.
       //!
-      //! The template argument T must be a class that has a
+      //! The template argument T must be a class that has a 
       //! non-arguments constructor and supports assignment.
       mailbox( const char *name = ""  ): mailbox_base( name ){}
 
       //! write an item into the mailbox
-      //!
-      //! The current (writing) task stores an item in the mailbox.
-      //! If a client (reader) is waiting, it is unblocked.
-      //! Otherwise the task waits (is blocked) until a reading task
-      //! has read the item.
+      //
+      //! If the mutex was set it it is now cleared, 
+      //! and the calling task owns the mutex. 
+      //! 
+      //! Otherwise the current task waits (is halted) until the 
+      //! owning task calls signal() on the same mutex. 
+      //! The signal() calls will release the tasks in 
+      //! the order of their wait() calls.
       void write( const T item ) {
          RTOS_STATISTICS( writes++; )
          data = item;
-         if ( reader != NULL ) {
-            task * tmp = reader;
-            reader = NULL;
+         if ( client != NULL ) {
             // someone is waiting to read, unblock it
-            tmp->unblock();
-         }
-         else {
-            if (writer != NULL)
-         		mkt_fatal (#UNIQUE_ERROR); // second writer for mailbox
-
-            // block until the reader gets the data
-            writer = RTOS::current_task();
-            writer->block();
-         }
+            client->unblock();
+            } else {
+                // block until the reader gets the data
+                client = RTOS::current_task();
+             client->block();
+            }
       }
-
-      //! read an item from the mailbox
+      
+      //! read a value from the mailbox
       //
-      //! If a writing tasks is waiting for the mailbox
-      //! it is unblocked and the reader gets the data.
-      //! Otherwise the current task is blocked until it
-      //! is released by a writer.
+      //! If one or more tasks are waiting for the mutex the first
+      //! one is released, and it now owns the mutex. 
+      //! Otherwise, if the mutex is cleared it is now set. 
+      //!
+      //! It is an error for a task to call signal() on a mutex 
+      //! that it does not own (that it did not call wait() on). 
+      //! After the signal the task no longer owns the mutex.
       T read (void) {
-         if ( writer != NULL ) {
-            // unblock the writer
-            task * tmp = writer;
-            writer = NULL;
-            tmp->unblock();
+         if ( client == NULL ) {
+            // no writer yet, so wait for a writer
+            client = RTOS::current_task();
+            client->block();
          }
          else {
-            if (reader != NULL)
-         		mkt_fatal (#UNIQUE_ERROR); // second reader for mailbox
-
-            // no writer yet, so wait for a writer
-            reader = RTOS::current_task();
-            reader->block();
+            // unblock the writer
+            client->unblock();
+              client = NULL;
          }
-         RTOS_STATISTICS( reads++; )
-         return data;
+           return data;
       }
 
    private:
@@ -1570,58 +1558,58 @@ public:
    //
    //! waitable data queue
    //
-   //! The (communication) channel is a template class that stores a queue
-   //! of values.
-   //! Values can be written at the tail of the queue, up to the number of
-   //! entries for which the channel was created.
-   //! It is an error to write to a channel that is full.
-   //! Writes are not blocking.
-   //! Any task can write to a channel.
+   //! The (communication) channel is a template class that stores a queue 
+   //! of values. 
+   //! Values can be written at the tail of the queue, up to the number of 
+   //! entries for which the channel was created. 
+   //! It is an error to write to a channel that is full. 
+   //! Writes are not blocking. 
+   //! Any task can write to a channel. 
    //!
-   //! A channel is created for a particular task.
-   //! Only this owner task can read from the channel.
-   //! A read will block until an entry is available.
+   //! A channel is created for a particular task. 
+   //! Only this owner task can read from the channel. 
+   //! A read will block until an entry is available. 
    //! Reads are from the head of the queue.
    //!
-   //! A channel is a waitable, so the task that owns the channel
-   //! can wait for the channel to be non-empty, after which a read
-   //! from a channel will be non-blocking (because the channel is
-   //! not empty).
-   //! After a wait() that returns the channel's event, the channel
-   //! will set itself again (because the wait did not cause it to
-   //! become empty).
-   //! Only a read that results in an empty queue will clear the channel.
-   //!
-   //! The example below shows how writing to cout can be buffered
-   //! by first writing to a 2kB channel, and reading from that
-   //! channel at a maximum of one character per 2 MS.
-   //! The UART hardware in the LPC2148 chip buffers one character,
-   //! which at default baudrate (38k4) takes ~ 1 MS to write.
-   //! So by writing at a maximum rate of one character per 2 MS
+   //! A channel is a waitable, so the task that owns the channel 
+   //! can wait for the channel to be non-empty, after which a read 
+   //! from a channel will be non-blocking (because the channel is 
+   //! not empty). 
+   //! After a wait() that returns the channel's event, the channel 
+   //! will set itself again (because the wait did not cause it to 
+   //! become empty). 
+   //! Only a read that results in an empty queue will clear the channel. 
+   //! 
+   //! The example below shows how writing to cout can be buffered 
+   //! by first writing to a 2kB channel, and reading from that 
+   //! channel at a maximum of one character per 2 MS. 
+   //! The UART hardware in the LPC2148 chip buffers one character, 
+   //! which at default baudrate (38k4) takes ~ 1 MS to write. 
+   //! So by writing at a maximum rate of one character per 2 MS 
    //! no blocking will occur.
    //!
    //! \code
-   //!
-   //! class output_class : public task {
+   //! 
+   //! class output_class : public task { 
    //! public:
    //!    channel< char, 2048 > buffer( flags, "buffer" );
    //!    timer hartbeat( flags, "hartbeat" );
-   //!    void main( void ){
+   //!    void main( void ){      
    //!       for(;;){
-   //!          wait( buffer );
+   //!          wait( buffer ); 
    //!          cout << buffer.get();
    //!          timer.set( 2 MS );
    //!          wait( timer );
    //!      }
    //!    }
    //! }
-   //!
+   //!    
    //! output_class output;
-   //!
+   //! 
    //! void print( char *s ){
    //!    while( *s != '\0' ){ output.buffer.write( *s++ ); }
    //! }
-   //!
+   //!    
    //! \endcode
    //
    //************************************************************************
@@ -1632,7 +1620,7 @@ public:
 
       //! constructor, specify stored type, number of entries, and name
       //
-      //! The template argument T must be a class that has a
+      //! The template argument T must be a class that has a 
       //! non-arguments constructor and supports assignment.
       channel( task * t, const char *name = "" ): channel_base( t, name ){}
 
